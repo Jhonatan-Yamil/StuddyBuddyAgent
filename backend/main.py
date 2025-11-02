@@ -1,11 +1,11 @@
 from dotenv import load_dotenv
 import os
 
-
 load_dotenv() 
 
 from fastapi import FastAPI, Request, UploadFile, Form, File
 from fastapi.responses import JSONResponse
+from typing import List
 from modules import ocr, speech, rag, db
 from schemas.request_models import GenerateRequest
 import uvicorn  
@@ -34,10 +34,16 @@ async def generate_response(body: GenerateRequest):
     return {"response": answer}
 
 @app.post("/upload-pdf")
-async def upload_pdf(file: UploadFile = File(...)):
-    data = await file.read()
-    result = rag.add_pdf_document(data, source=file.filename)
-    return {"message": "Document uploaded successfully", "details": result}
+async def upload_pdf(files: List[UploadFile] = File(...)):
+    results = []
+    for file in files:
+        data = await file.read()
+        if file.filename.endswith(".pdf"):
+            res = rag.add_pdf_document(data, source=file.filename)
+        else:
+            res = False
+        results.append({"filename": file.filename, "success": res})
+    return {"results": results}
 
 if __name__ == "__main__":
     uvicorn.run(

@@ -2,7 +2,7 @@ from sentence_transformers import SentenceTransformer
 import chromadb
 from chromadb.utils import embedding_functions
 from chromadb.config import Settings
-from PyPDF2 import PdfReader
+from pypdf import PdfReader
 from modules import db
 from openai import OpenAI
 import io
