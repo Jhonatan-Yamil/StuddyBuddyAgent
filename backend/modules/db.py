@@ -29,4 +29,4 @@ def get_last_messages(n=5):
     cursor.execute("SELECT role, message FROM chat_history ORDER BY id DESC LIMIT ?", (n,))
     rows = cursor.fetchall()
     conn.close()
-    return list(reversed(rows))  # para que estén en orden cronológico
+    return list(reversed(rows))
