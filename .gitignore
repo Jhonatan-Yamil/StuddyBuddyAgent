@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.env.*      
+*.sqlite3
+*.db
+*.db-journal
+*.log
+
+# Virtual environments
+venv/
+env/
+.venv/
+.env/
+
+# IDEs / editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Byte-compiled / cache
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Chroma / embeddings / vector store
+vector_store/
+
+# Pytest / test cache
+.pytest_cache/
+coverage.xml
+htmlcov/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# OS-specific
+.DS_Store
+Thumbs.db

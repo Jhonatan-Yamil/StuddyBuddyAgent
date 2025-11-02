@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pytesseract
+pillow
+speechrecognition
+openai-whisper
+torch
+sentence-transformers
+chromadb
+pypdf
+gtts
+python-dotenv
+python-multipart
