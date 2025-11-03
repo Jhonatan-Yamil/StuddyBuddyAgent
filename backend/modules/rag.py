@@ -75,7 +75,7 @@ def query_knowledge_base(query: str):
         return generate_with_gpt(query)
 
 def generate_with_gpt(prompt: str, context: str = None):
-    history = db.get_last_messages(5)
+    history = db.get_last_messages(10)
     history_text = "\n".join(f"{role}: {msg}" for role, msg in history)
     final_prompt = (
         f"Chat history:\n{history_text}\n\nContext:\n{context}\n\nQuestion: {prompt}\n\n"
@@ -91,11 +91,13 @@ def generate_with_gpt(prompt: str, context: str = None):
     answer = response.choices[0].message.content
     db.add_message("user", prompt)
     db.add_message("assistant", answer)
+    if len(answer.split()) > 20:  
+        add_text_document(answer, source="chat_response")
     return answer
 
 # Quizz
 def generate_quiz(topic: str, n_questions: int = 10):
-    context = retrieve_context(topic)  # Ahora solo docs raw
+    context = retrieve_context(topic)  
     prompt = f"""
     Genera {n_questions} preguntas de opción múltiple sobre el siguiente tema:
     {context if context else topic}
