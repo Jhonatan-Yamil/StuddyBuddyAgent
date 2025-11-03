@@ -97,6 +97,19 @@ async def generate_quiz_endpoint(body: GenerateRequest):
         print(f"Error generating quiz: {e}")
         raise HTTPException(status_code=500, detail="Error generating quiz.")
 
+# Para ver el contenido del RAG 
+@app.get("/debug-rag")
+async def debug_rag():
+    try:
+        all_docs = rag.collection.get(include=["documents", "metadatas"])
+        return {
+            "total_documents": len(all_docs["documents"]),
+            "documents": all_docs["documents"],
+            "metadatas": all_docs["metadatas"]
+        }
+    except Exception as e:
+        return {"error": str(e)}
+
 frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
 app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
 

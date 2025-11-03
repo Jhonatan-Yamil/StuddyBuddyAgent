@@ -74,7 +74,7 @@ def query_knowledge_base(query: str):
         print("Error in RAG:", e)
         return generate_with_gpt(query)
 
-def generate_with_gpt(prompt: str, context: str = None):
+def generate_with_gpt(prompt: str, context: str = None, store_in_rag: bool = True):
     history = db.get_last_messages(10)
     history_text = "\n".join(f"{role}: {msg}" for role, msg in history)
     final_prompt = (
@@ -91,8 +91,8 @@ def generate_with_gpt(prompt: str, context: str = None):
     answer = response.choices[0].message.content
     db.add_message("user", prompt)
     db.add_message("assistant", answer)
-    if len(answer.split()) > 20:  
-        add_text_document(answer, source="chat_response")
+    if store_in_rag and len(answer.split()) > 20:
+        add_text_document(answer, source="chat_response")    
     return answer
 
 # Quizz
@@ -112,4 +112,4 @@ def generate_quiz(topic: str, n_questions: int = 10):
       ...
     ]
     """
-    return generate_with_gpt(prompt)
+    return generate_with_gpt(prompt, store_in_rag=False)
