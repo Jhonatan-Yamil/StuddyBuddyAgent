@@ -4,7 +4,7 @@ __pycache__/
 *.pyo
 *.pyd
 *.env
-*.env.*      
+*.env.*
 *.sqlite3
 *.db
 *.db-journal
@@ -15,6 +15,10 @@ venv/
 env/
 .venv/
 .env/
+
+# UV
+.uv-cache/
+.uv/
 
 # IDEs / editors
 .vscode/

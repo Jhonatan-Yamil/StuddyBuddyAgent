@@ -14,6 +14,25 @@ embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
 chroma_client = chromadb.Client(Settings(persist_directory="./vector_store"))
 collection = chroma_client.get_or_create_collection(name="educational_docs")
 
+# Funciones para agregar documentos 
+def add_text_document(text: str, source: str):
+    try:
+        if not text.strip():
+            raise ValueError("Text is empty.")
+        chunks = [text[i:i+1000] for i in range(0, len(text), 1000)]
+        embeddings = embedding_model.encode(chunks).tolist()
+        ids = [str(uuid.uuid4()) for _ in chunks]
+        collection.add(
+            ids=ids,
+            documents=chunks,
+            embeddings=embeddings
+        )
+        print(f"Text '{source}' added successfully with {len(chunks)} chunks.")
+        return True
+    except Exception as e:
+        print("Error adding text:", e)
+        return False
+
 def add_pdf_document(file_bytes: bytes, source: str):
     try:
         pdf = PdfReader(io.BytesIO(file_bytes))
@@ -34,17 +53,22 @@ def add_pdf_document(file_bytes: bytes, source: str):
         print("Error adding document:", e)
         return False
 
+# Retrieval
+def retrieve_context(query: str, n_results: int = 3) -> str:
+    try:
+        results = collection.query(query_texts=[query], n_results=n_results)
+        docs = results.get("documents", [[]])[0]
+        return "\n".join(docs) if docs else ""
+    except Exception as e:
+        print("Error en retrieval:", e)
+        return ""
+    
+# RAG + LLM
 def query_knowledge_base(query: str):
     try:
-        results = collection.query(
-            query_texts=[query],
-            n_results=3
-        )
-        docs = results.get("documents", [[]])[0]
-        if not docs:
-            print("No relevant documents found. Using GPT-4o directly.")
+        context = retrieve_context(query)
+        if not context:
             return generate_with_gpt(query)
-        context = "\n".join(docs)
         return generate_with_gpt(query, context=context)
     except Exception as e:
         print("Error in RAG:", e)
@@ -68,3 +92,22 @@ def generate_with_gpt(prompt: str, context: str = None):
     db.add_message("user", prompt)
     db.add_message("assistant", answer)
     return answer
+
+# Quizz
+def generate_quiz(topic: str, n_questions: int = 10):
+    context = retrieve_context(topic)  # Ahora solo docs raw
+    prompt = f"""
+    Genera {n_questions} preguntas de opción múltiple sobre el siguiente tema:
+    {context if context else topic}
+
+    Devuelve un JSON nada más que un JSON con la siguiente estructura:
+    [
+      {{
+        "question": "Texto de la pregunta",
+        "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
+        "answer": "Opción correcta"
+      }},
+      ...
+    ]
+    """
+    return generate_with_gpt(prompt)
