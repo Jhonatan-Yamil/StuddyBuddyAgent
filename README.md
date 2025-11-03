@@ -5,9 +5,9 @@ StudyBuddyAgent es un tutor virtual inteligente que combina un LLM (OpenAI) con 
 
 ## Integrantes
 
-- Jhonatan Cabezas
-- Rebeca Navarro
-- Valeria Zerain
+- Jhonatan Cabezas 70416
+- Rebeca Navarro 68919
+- Valeria Zerain 68019
 
 ## Funcionalidades principales
 
