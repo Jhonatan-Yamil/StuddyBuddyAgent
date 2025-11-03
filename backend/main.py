@@ -6,7 +6,7 @@ load_dotenv()
 from fastapi import FastAPI, Request, UploadFile, Form, File
 from fastapi.responses import JSONResponse
 from typing import List
-from modules import ocr, speech, rag, db
+from modules import speech, rag, db, image_llm
 from schemas.request_models import GenerateRequest
 import uvicorn  
 
@@ -18,10 +18,17 @@ db.init_db()
 def root():
     return {"message": "StudyBuddy AI is running"}
 
-@app.post("/ocr")
-async def process_image(file: UploadFile):
-    text = ocr.extract_text(await file.read())
-    return {"extracted_text": text}
+@app.post("/upload-image")
+async def upload_image(file: UploadFile = File(...)):
+    image_bytes = await file.read()
+    llm_context = image_llm.process_image(
+        image_bytes,
+        prompt_extra="Analiza esta imagen (diagrama, gráfico, etc.) y genera un resumen que pueda ser usado para responder preguntas posteriormente."
+    )
+    return {
+        "message": "Image processed successfully and added to RAG.",
+        "llm_context": llm_context
+    }
 
 @app.post("/speech-to-text")
 async def transcribe_audio(file: UploadFile):
@@ -44,6 +51,12 @@ async def upload_pdf(files: List[UploadFile] = File(...)):
             res = False
         results.append({"filename": file.filename, "success": res})
     return {"results": results}
+
+@app.post("/generate-quiz")
+async def generate_quiz_endpoint(body: GenerateRequest):
+    quiz_json = rag.generate_quiz(body.query)
+    return {"quiz": quiz_json}
+
 
 if __name__ == "__main__":
     uvicorn.run(

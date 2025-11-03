@@ -1,7 +1,5 @@
 fastapi
 uvicorn
-pytesseract
-pillow
 speechrecognition
 openai-whisper
 torch
