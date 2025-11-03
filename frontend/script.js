@@ -1,37 +1,73 @@
+const API_BASE = ""; 
+const chatBox = document.getElementById("chat-box");
 const form = document.getElementById("chat-form");
 const input = document.getElementById("user-input");
-const chatBox = document.getElementById("chat-box");
-
-const API_URL = "/generate"; 
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  const userMessage = input.value.trim();
-  if (!userMessage) return;
-
-  addMessage(userMessage, "user");
+  const text = input.value.trim();
+  if (!text) return;
+  addMessage(text, "user");
   input.value = "";
 
-  const loadingMsg = addMessage("Escribiendo...", "bot");
+  const loading = addMessage("Escribiendo...", "bot");
 
   try {
-    const response = await fetch(API_URL, {
+    const res = await fetch(`${API_BASE}/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: userMessage }),
+      body: JSON.stringify({ query: text }),
     });
-
-    const data = await response.json();
-
-    chatBox.removeChild(loadingMsg);
-
-    addMessage(data.response, "bot");
-  } catch (error) {
-    console.error("Error:", error);
-    chatBox.removeChild(loadingMsg);
-    addMessage("Error al conectar con el servidor.", "bot");
+    const data = await res.json();
+    chatBox.removeChild(loading);
+    addMessage(data.response || "Sin respuesta", "bot");
+  } catch (err) {
+    console.error(err);
+    chatBox.removeChild(loading);
+    addMessage("Error al conectar con el servidor", "bot");
   }
+});
+
+document.getElementById("pdf-upload").addEventListener("change", async (e) => {
+  const files = e.target.files;
+  if (!files.length) return;
+  addMessage("📤 Subiendo PDF...", "bot");
+
+  const formData = new FormData();
+  for (const file of files) formData.append("files", file);
+
+  const res = await fetch(`${API_BASE}/upload-pdf`, { method: "POST", body: formData });
+  const data = await res.json();
+
+  addMessage("✅ PDFs procesados", "bot");
+});
+
+document.getElementById("image-upload").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  addMessage("🖼️ Analizando imagen...", "bot");
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${API_BASE}/upload-image`, { method: "POST", body: formData });
+  const data = await res.json();
+
+  addMessage("✅ Imagen procesada correctamente", "bot");
+});
+
+document.getElementById("audio-upload").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  addMessage("🎙️ Transcribiendo audio...", "bot");
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${API_BASE}/speech-to-text`, { method: "POST", body: formData });
+  const data = await res.json();
+
+  addMessage(`🗣️ Transcripción: ${data.transcription}`, "bot");
 });
 
 function addMessage(text, sender) {
