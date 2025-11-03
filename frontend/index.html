@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StudyBuddy AI Chat</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f6f9fc; display: flex; flex-direction: column; align-items: center; padding: 30px;">
+
+  <h1 style="color: #1a73e8;">💬 StudyBuddy AI</h1>
+  <p style="color: #555; max-width: 600px; text-align: center;">
+    Tu asistente para estudiar mejor. Sube tus materiales, haz preguntas y recibe explicaciones claras.
+  </p>
+
+  <div id="chat-box" 
+       style="background-color: white; border: 1px solid #ccc; border-radius: 10px; width: 100%; max-width: 600px; padding: 15px; height: 400px; overflow-y: auto; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+  </div>
+
+  <form id="chat-form" 
+        style="margin-top: 15px; display: flex; gap: 10px; width: 100%; max-width: 600px;">
+    <input type="text" id="user-input" placeholder="Escribe tu pregunta..." required
+           style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px;">
+    <button type="submit"
+            style="background-color: #1a73e8; color: white; border: none; border-radius: 6px; padding: 10px 20px; font-size: 16px; cursor: pointer;">
+      Enviar
+    </button>
+  </form>
+
+  <script>
+    const form = document.getElementById("chat-form");
+    const input = document.getElementById("user-input");
+    const chatBox = document.getElementById("chat-box");
+    const API_URL = "/generate"; 
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const userMessage = input.value.trim();
+      if (!userMessage) return;
+
+      addMessage(userMessage, "user");
+      input.value = "";
+
+      const loading = addMessage("...", "bot");
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: userMessage })
+        });
+
+        const data = await response.json();
+        chatBox.removeChild(loading);
+        addMessage(data.response, "bot");
+      } catch (err) {
+        console.error(err);
+        chatBox.removeChild(loading);
+        addMessage("Error al conectar con el servidor.", "bot");
+      }
+    });
+
+    function addMessage(text, sender) {
+      const msg = document.createElement("div");
+      msg.textContent = text;
+      msg.style.margin = "8px 0";
+      msg.style.padding = "8px 12px";
+      msg.style.borderRadius = "8px";
+      msg.style.maxWidth = "80%";
+      msg.style.lineHeight = "1.4";
+      msg.style.whiteSpace = "pre-wrap";
+
+      if (sender === "user") {
+        msg.style.backgroundColor = "#e3f2fd";
+        msg.style.alignSelf = "flex-end";
+        msg.style.textAlign = "right";
+        msg.style.marginLeft = "auto";
+      } else {
+        msg.style.backgroundColor = "#f1f3f4";
+        msg.style.alignSelf = "flex-start";
+        msg.style.textAlign = "left";
+      }
+
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return msg;
+    }
+  </script>
+</body>
+</html>
