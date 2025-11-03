@@ -53,14 +53,22 @@ def add_pdf_document(file_bytes: bytes, source: str):
         print("Error adding document:", e)
         return False
 
+# Retrieval
+def retrieve_context(query: str, n_results: int = 3) -> str:
+    try:
+        results = collection.query(query_texts=[query], n_results=n_results)
+        docs = results.get("documents", [[]])[0]
+        return "\n".join(docs) if docs else ""
+    except Exception as e:
+        print("Error en retrieval:", e)
+        return ""
+    
 # RAG + LLM
 def query_knowledge_base(query: str):
     try:
-        results = collection.query(query_texts=[query], n_results=3)
-        docs = results.get("documents", [[]])[0]
-        if not docs:
+        context = retrieve_context(query)
+        if not context:
             return generate_with_gpt(query)
-        context = "\n".join(docs)
         return generate_with_gpt(query, context=context)
     except Exception as e:
         print("Error in RAG:", e)
@@ -86,13 +94,13 @@ def generate_with_gpt(prompt: str, context: str = None):
     return answer
 
 # Quizz
-def generate_quiz(topic: str, n_questions: int = 5):
-    context = query_knowledge_base(topic)
+def generate_quiz(topic: str, n_questions: int = 10):
+    context = retrieve_context(topic)  # Ahora solo docs raw
     prompt = f"""
     Genera {n_questions} preguntas de opción múltiple sobre el siguiente tema:
-    {context}
+    {context if context else topic}
 
-    Devuelve un JSON con la siguiente estructura:
+    Devuelve un JSON nada más que un JSON con la siguiente estructura:
     [
       {{
         "question": "Texto de la pregunta",

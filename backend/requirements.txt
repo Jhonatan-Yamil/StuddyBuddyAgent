@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 speechrecognition
+pillow
 openai-whisper
 torch
 sentence-transformers
