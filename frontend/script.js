@@ -73,7 +73,7 @@ document.getElementById("audio-upload").addEventListener("change", async (e) => 
 function addMessage(text, sender) {
   const msg = document.createElement("div");
   msg.classList.add("message", sender);
-  msg.innerText = text;
+  msg.innerHTML = marked.parse(text);
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
   return msg;
@@ -84,7 +84,7 @@ const chatHistory = [];
 function addMessage(text, sender) {
   const msg = document.createElement("div");
   msg.classList.add("message", sender);
-  msg.innerText = text;
+  msg.innerHTML = marked.parse(text);
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -93,6 +93,7 @@ function addMessage(text, sender) {
 }
 
 document.getElementById("create-form-btn").addEventListener("click", async () => {
+  addMessage("Creando formulario, una vez creado se te redirigirá", "bot");
   try {
     const res = await fetch(`${API_BASE}/generate-quiz`, {
       method: "POST",
