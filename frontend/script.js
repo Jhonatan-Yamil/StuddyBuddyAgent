@@ -59,7 +59,7 @@ document.getElementById("image-upload").addEventListener("change", async (e) => 
 document.getElementById("audio-upload").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
-  addMessage("Transcribiendo audio...", "bot");
+  addMessage("Escuchando audio...", "bot");
 
   const formData = new FormData();
   formData.append("file", file);
@@ -67,7 +67,7 @@ document.getElementById("audio-upload").addEventListener("change", async (e) => 
   const res = await fetch(`${API_BASE}/speech-to-text`, { method: "POST", body: formData });
   const data = await res.json();
 
-  addMessage(`Transcripción: ${data.transcription}`, "bot");
+  addMessage("Ya puedes hacer preguntas sobre el contenido del audio.", "bot");
 });
 
 function addMessage(text, sender) {
