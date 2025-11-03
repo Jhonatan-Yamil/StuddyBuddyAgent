@@ -78,3 +78,33 @@ function addMessage(text, sender) {
   chatBox.scrollTop = chatBox.scrollHeight;
   return msg;
 }
+
+const chatHistory = [];
+
+function addMessage(text, sender) {
+  const msg = document.createElement("div");
+  msg.classList.add("message", sender);
+  msg.innerText = text;
+  chatBox.appendChild(msg);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  chatHistory.push({ role: sender, content: text });
+  return msg;
+}
+
+document.getElementById("create-form-btn").addEventListener("click", async () => {
+  try {
+    const res = await fetch(`${API_BASE}/generate-quiz`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: JSON.stringify(chatHistory) }),
+    });
+    const data = await res.json();
+    localStorage.setItem("latestQuiz", JSON.stringify(data.quiz));
+    window.location.href = "/formulario.html";
+  } catch (err) {
+    console.error(err);
+    addMessage("Error al crear el formulario.", "bot");
+  }
+});
+
