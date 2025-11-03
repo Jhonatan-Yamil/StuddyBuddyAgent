@@ -5,6 +5,8 @@ load_dotenv()
 
 from fastapi import FastAPI, Request, UploadFile, Form, File, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from typing import List
 from modules import speech, rag, db, image_llm
 from schemas.request_models import GenerateRequest
@@ -12,11 +14,19 @@ import uvicorn
 
 app = FastAPI(title="StudyBuddy AI ")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 db.init_db()
 
-@app.get("/")
-def root():
-    return {"message": "StudyBuddy AI is running"}
+# @app.get("/")
+# def root():
+#     return {"message": "StudyBuddy AI is running"}
 
 @app.post("/upload-image")
 async def upload_image(file: UploadFile = File(...)):
@@ -87,11 +97,13 @@ async def generate_quiz_endpoint(body: GenerateRequest):
         print(f"Error generating quiz: {e}")
         raise HTTPException(status_code=500, detail="Error generating quiz.")
 
+frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
+app.mount("/", StaticFiles(directory=frontend_path, html=True), name="frontend")
 
 if __name__ == "__main__":
     uvicorn.run(
-        "main:app",        
-        host="0.0.0.0",
+        "main:app",
+        host="127.0.0.1",
         port=8000,
         reload=True
     )
