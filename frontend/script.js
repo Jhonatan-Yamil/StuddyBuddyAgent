@@ -31,7 +31,7 @@ form.addEventListener("submit", async (e) => {
 document.getElementById("pdf-upload").addEventListener("change", async (e) => {
   const files = e.target.files;
   if (!files.length) return;
-  addMessage("📤 Subiendo PDF...", "bot");
+  addMessage("Subiendo PDF...", "bot");
 
   const formData = new FormData();
   for (const file of files) formData.append("files", file);
@@ -39,13 +39,13 @@ document.getElementById("pdf-upload").addEventListener("change", async (e) => {
   const res = await fetch(`${API_BASE}/upload-pdf`, { method: "POST", body: formData });
   const data = await res.json();
 
-  addMessage("✅ PDFs procesados", "bot");
+  addMessage("Ya puedes hacer preguntas sobre el contenido de los PDFs.", "bot");
 });
 
 document.getElementById("image-upload").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
-  addMessage("🖼️ Analizando imagen...", "bot");
+  addMessage("Analizando imagen...", "bot");
 
   const formData = new FormData();
   formData.append("file", file);
@@ -53,13 +53,13 @@ document.getElementById("image-upload").addEventListener("change", async (e) => 
   const res = await fetch(`${API_BASE}/upload-image`, { method: "POST", body: formData });
   const data = await res.json();
 
-  addMessage("✅ Imagen procesada correctamente", "bot");
+  addMessage("Ya puedes hacer preguntas sobre el contenido de la imagen.", "bot");
 });
 
 document.getElementById("audio-upload").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
-  addMessage("🎙️ Transcribiendo audio...", "bot");
+  addMessage("Transcribiendo audio...", "bot");
 
   const formData = new FormData();
   formData.append("file", file);
@@ -67,7 +67,7 @@ document.getElementById("audio-upload").addEventListener("change", async (e) => 
   const res = await fetch(`${API_BASE}/speech-to-text`, { method: "POST", body: formData });
   const data = await res.json();
 
-  addMessage(`🗣️ Transcripción: ${data.transcription}`, "bot");
+  addMessage(`Transcripción: ${data.transcription}`, "bot");
 });
 
 function addMessage(text, sender) {
