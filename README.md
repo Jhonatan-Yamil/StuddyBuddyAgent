@@ -1,6 +1,6 @@
-# StudyBuddyAgent
+# StudyBuddy AI
 
-StudyBuddyAgent es un tutor virtual inteligente que combina un LLM (OpenAI) con una base de conocimiento vectorial (RAG) para ofrecer ayuda educativa personalizada. Permite almacenar documentos (PDFs), transcripciones de audio, imágenes analizadas y el historial de chat para construir contexto y generar respuestas más precisas, resúmenes, explicaciones y quizzes.
+StudyBuddy AI es un tutor virtual inteligente que combina un LLM (OpenAI) con una base de conocimiento vectorial (RAG) para ofrecer ayuda educativa personalizada. Permite almacenar documentos (PDFs), transcripciones de audio, imágenes analizadas y el historial de chat para construir contexto y generar respuestas más precisas, resúmenes, explicaciones y quizzes.
 
 
 ## Integrantes
